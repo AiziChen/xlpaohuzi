@@ -53,6 +53,18 @@
           [(and user-rs (hash-ref user-rs 'unionid #f))
            =>
            (lambda (unionid)
+             (define login-rs (app-wechat-login openid unionid access-token refresh-token))
+             (cond
+               [(and login-rs (= (hash-ref login-rs 'errCode -1) 0))
+                (response/json
+                 (hasheq 'code 200
+                         'data (hash-ref login-rs 'data (hasheq))))]
+               [else
+                (response/json
+                 (hasheq 'code 500
+                         'msg "app login error"
+                         'data (hasheq)))])
+             #;
              (response/json
               (hasheq 'code 200
                       'data (hasheq 'openid openid
@@ -88,6 +100,18 @@
           [(and user-rs (hash-ref user-rs 'unionid #f))
            =>
            (lambda (unionid)
+             (define login-rs (app-wechat-login openid unionid access-token refresh-token))
+             (cond
+               [(and login-rs (= (hash-ref login-rs 'errCode -1) 0))
+                (response/json
+                 (hasheq 'code 200
+                         'data (hash-ref login-rs 'data (hasheq))))]
+               [else
+                (response/json
+                 (hasheq 'code 500
+                         'msg "app login error"
+                         'data (hasheq)))])
+             #;
              (response/json
               (hasheq 'code 200
                       'data (hasheq 'openid openid
