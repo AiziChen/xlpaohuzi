@@ -25,7 +25,11 @@
 
    [("api" "generate-token-by-refresh-token" (string-arg))
     #:method "get"
-    generate-token-by-refresh-token]))
+    generate-token-by-refresh-token]
+
+   [("api" "wechat-login")
+    #:method "post"
+    wechat-login]))
 
 
 

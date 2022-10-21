@@ -14,7 +14,8 @@
 (provide
  get-signature
  generate-token-by-code
- generate-token-by-refresh-token)
+ generate-token-by-refresh-token
+ wechat-login)
 
 (define (get-signature req)
   (let* ([raw (request-post-data/raw req)]
@@ -37,6 +38,7 @@
                 'msg "parameter `method` and `url` must specify"
                 'data (hasheq)))])))
 
+
 (define (generate-token-by-code req code)
   (cond
     [(non-empty-string? code)
@@ -54,8 +56,8 @@
              (response/json
               (hasheq 'code 200
                       'data (hasheq 'openid openid
-                                    'access-token access-token
-                                    'refresh-token refresh-token
+                                    'wc-access-token access-token
+                                    'wc-refresh-token refresh-token
                                     'unionid unionid))))]
           [else
            (response/json
@@ -89,18 +91,13 @@
              (response/json
               (hasheq 'code 200
                       'data (hasheq 'openid openid
-                                    'access-token access-token
-                                    'refresh-token refresh-token
+                                    'wc-access-token access-token
+                                    'wc-refresh-token refresh-token
                                     'unionid unionid))))]
           [else
            (response/json
             (hasheq 'code 500
-                    'msg "get wechat user information error"))])
-        (response/json
-         (hasheq 'code 200
-                 'data (hasheq 'openid openid
-                               'access-token access-token
-                               'refresh-token refresh-token)))]
+                    'msg "get wechat user information error"))])]
        [else
         (response/json
          (hasheq 'code 500
@@ -111,3 +108,29 @@
       (hasheq 'code 500
               'msg "parameter `code` must specify or parameter `code` can not be null"
               'data (hasheq)))]))
+
+(define (wechat-login req)
+  (let* ([raw (request-post-data/raw req)]
+         [data (bytes->jsexpr raw)]
+         [openid (hash-ref data 'openid #f)]
+         [unionid (hash-ref data 'unionid #f)]
+         [wc-access-token (hash-ref data 'wc-access-token #f)]
+         [wc-refresh-token (hash-ref data 'wc-refresh-token #f)])
+    (cond
+      [(and openid unionid wc-access-token wc-refresh-token)
+       (define rs (app-wechat-login openid unionid wc-access-token wc-refresh-token))
+       (cond
+         [(and rs (= (hash-ref rs 'errCode -1) 0))
+          (response/json
+           (hasheq 'code 200
+                   'data (hash-ref rs 'data (hasheq))))]
+         [else
+          (response/json
+           (hasheq 'code 500
+                   'msg "app login error"
+                   'data (hasheq)))])]
+      [else
+       (response/json
+        (hasheq 'code 500
+                'msg "must need all of these `openid`, `unionid`, `wc-access-token`, `wc-refresh-token` paramters"
+                'data (hasheq)))])))

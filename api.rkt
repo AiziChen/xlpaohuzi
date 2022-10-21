@@ -11,7 +11,8 @@
 (provide
  wc-sns-oauth2
  wc-sns-oauth2-refresh-token
- wc-sns-userinfo)
+ wc-sns-userinfo
+ app-wechat-login)
 
 
 (define (wc-sns-oauth2 code)
@@ -47,12 +48,11 @@
        (response-json res)))
 
 
-
 (define (app-wechat-login openid unionid wc-access-token wc-refresh-token)
   (define muuid (uuid-string))
   (define params
     `((androidId . "208a1c1b7bdb3a12")
-      (appId . 10001)
+      (appId . "10001")
       (chId . "")
       (clientId . "0")
       (deviceId . "67401041480114|89860321167553961863|90:F0:52:8D:A4:6F")
@@ -72,7 +72,7 @@
           (lambda (v1 v2)
             (symbol<? (car v1) (car v2)))))
   (define encoded-params
-    (alist->form-urlencoded sorted-params))
+    (alist->form sorted-params))
   (define cseconds (current-seconds))
   (define url "https://api.wxianlai.com/uc/v2/login/wechat")
   (define res
@@ -89,6 +89,7 @@
                  'X-QP-Signature
                  (generate-signature "GET"
                                      (string-append url "?" encoded-params)
+                                     muuid
                                      cseconds)
                  'X-QP-Timestamp (number->string cseconds)
                  'Host "api.wxianlai.com"
