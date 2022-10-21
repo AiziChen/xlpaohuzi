@@ -7,6 +7,7 @@
          json
          racket/format
          racket/string
+         racket/hash
          "utils.rkt"
          "api.rkt")
 
@@ -58,7 +59,12 @@
                [(and login-rs (= (hash-ref login-rs 'errCode -1) 0))
                 (response/json
                  (hasheq 'code 200
-                         'data (hash-ref login-rs 'data (hasheq))))]
+                         'data
+                         (hash-union
+                          (hash-ref login-rs 'data (hasheq))
+                          (hasheq
+                           'wc-access-token access-token
+                           'wc-refresh-token refresh-token))))]
                [else
                 (response/json
                  (hasheq 'code 500
@@ -105,7 +111,12 @@
                [(and login-rs (= (hash-ref login-rs 'errCode -1) 0))
                 (response/json
                  (hasheq 'code 200
-                         'data (hash-ref login-rs 'data (hasheq))))]
+                         'data
+                         (hash-union
+                          (hash-ref login-rs 'data (hasheq))
+                          (hasheq
+                           'wc-access-token access-token
+                           'wc-refresh-token refresh-token))))]
                [else
                 (response/json
                  (hasheq 'code 500
