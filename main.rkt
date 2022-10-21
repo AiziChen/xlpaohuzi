@@ -21,7 +21,7 @@
 
    [("api" "generate-token-by-code" (string-arg))
     #:method "get"
-    generate-token]
+    generate-token-by-code]
 
    [("api" "generate-token-by-refresh-token" (string-arg))
     #:method "get"

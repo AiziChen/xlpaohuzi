@@ -26,7 +26,7 @@
        (response-json res)))
 
 
-(define (wc-sns-oauth2-refresh-token refresh-token openid)
+(define (wc-sns-oauth2-refresh-token refresh-token)
   (define res
     (get "https://api.weixin.qq.com/sns/oauth2/refresh_token"
          #:params
@@ -92,4 +92,6 @@
                                      cseconds)
                  'X-QP-Timestamp (number->string cseconds)
                  'Host "api.wxianlai.com"
-                 'Connection "Keep-Alive"))))
+                 'Connection "Keep-Alive")))
+  (and (= (response-status-code res) 200)
+       (response-json res)))
